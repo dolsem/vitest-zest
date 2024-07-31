@@ -1,6 +1,6 @@
 {
   "name": "vitest-zest",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "license": "MIT",
   "author": "Denis Olsem",
   "homepage": "https://github.com/dolsem/vitest-zest#readme",
@@ -16,9 +16,14 @@
     "test",
     "jest"
   ],
+  "engines": {
+    "node": ">= v20.16.0"
+  },
   "source": "src/index.ts",
-  "main": "dist/vitest-zest.js",
+  "main": "dist/main/index.js",
+  "module": "dist/vitest-zest.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],
@@ -55,6 +60,7 @@
   "devDependencies": {
     "@parcel/packager-ts": "^2.10.3",
     "@parcel/transformer-typescript-types": "^2.10.3",
+    "@types/node": "^22.0.1",
     "parcel": "^2.10.3",
     "typescript": "^4.9.5"
   }
