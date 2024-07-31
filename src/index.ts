@@ -1,5 +1,5 @@
 import {
-  describe, beforeEach, afterEach, vi,
+  describe, beforeEach, afterEach, vi, expect,
   type Mock,
 } from 'vitest';
 
@@ -52,11 +52,18 @@ export function vary<T>(initialValue: T): {
   new (newValue: T): void;
   each(variations: ReadonlyArray<T>): ReturnType<typeof describe.each>;
 } {
-  let currentValue = initialValue;
-
-  beforeEach(() => {
-    currentValue = initialValue;
-  });
+  let currentValue: T;
+  const setCurrentValue = (newValue: T) => {
+    const { testPath } = expect.getState();
+    if (testPath) {
+      currentValue = newValue;
+    } else {
+      beforeEach(() => {
+        currentValue = newValue;
+      });
+    }
+  }
+  setCurrentValue(initialValue);
 
   class Base {
     static each(
@@ -83,9 +90,7 @@ export function vary<T>(initialValue: T): {
       if (args.length === 0) {
         return currentValue;
       } else if (args.length === 1) {
-        beforeEach(() => {
-          currentValue = args[0] as typeof currentValue;
-        });
+        setCurrentValue(args[0] as typeof currentValue);
         return;
       } else {
         console.error(args);
@@ -95,9 +100,7 @@ export function vary<T>(initialValue: T): {
       }
     },
     construct(_target: {}, [newValue]) {
-      beforeEach(() => {
-        currentValue = newValue;
-      });
+      setCurrentValue(newValue);
       return {};
     },
   }) as unknown as {

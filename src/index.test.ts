@@ -106,6 +106,11 @@ describe('vary()', () => {
       expect(subject()).toEqual(5);
     });
 
+    it('can be used inside it block', () => {
+      subject(4);
+      expect(subject()).toEqual(4);
+    });
+
     describe('new', () => {
       describe('override with 9', () => {
         new subject(9);
