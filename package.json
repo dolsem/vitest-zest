@@ -1,6 +1,6 @@
 {
   "name": "vitest-zest",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "license": "MIT",
   "author": "Denis Olsem",
   "homepage": "https://github.com/dolsem/vitest-zest#readme",
@@ -17,7 +17,7 @@
     "jest"
   ],
   "engines": {
-    "node": ">= v20.16.0"
+    "node": ">= v16.20.0"
   },
   "source": "src/index.ts",
   "main": "dist/main/index.js",
