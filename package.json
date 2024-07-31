@@ -23,7 +23,6 @@
   "main": "dist/main/index.js",
   "module": "dist/vitest-zest.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "files": [
     "dist"
   ],
@@ -34,11 +33,6 @@
         "types": "./dist/index.d.js",
         "default": "./dist/vitest-zest.js"
       }
-    }
-  },
-  "targets": {
-    "main": {
-      "optimize": false
     }
   },
   "scripts": {
