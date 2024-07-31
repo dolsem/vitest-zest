@@ -1,3 +1,8 @@
+import {
+  describe, beforeEach, afterEach, vi,
+  type Mock,
+} from 'vitest';
+
 export function lazy<T>(
   creator: () => T,
   cleanup?: (object: T) => void
@@ -103,14 +108,17 @@ export function vary<T>(initialValue: T): {
   };
 }
 
-export function fresh<T>(
-  creator: () => T,
-  refresher: (object: T) => void
+export function fresh<T = ReturnType<typeof vi.fn>>(
+  creator?: () => T,
+  refresher?: (object: T) => void,
 ): Array<T> & (() => T) {
+  const _creator = creator ?? vi.fn as () => T;
+  const _refresher = refresher ?? ((mock: Mock) => mock.mockClear()) as (object: T) => void;
+  
   function create() {
-    const object = creator();
+    const object = _creator();
     afterEach(() => {
-      refresher(object);
+      _refresher(object);
     });
     return object;
   }
@@ -132,9 +140,9 @@ export function fresh<T>(
       if (typeof prop === 'string') {
         const index = parseInt(prop, 10);
         if (index.toString() === prop) {
-          const object = creator();
+          const object = _creator();
           afterEach(() => {
-            refresher(object);
+            _refresher(object);
           });
           return object;
         }
@@ -147,5 +155,3 @@ export function fresh<T>(
     },
   }) as Array<T> & (() => T);
 }
-
-export const freshFn = fresh(jest.fn, (mock) => mock.mockClear());

@@ -1,15 +1,14 @@
-# jest-zest
+# vitest-zest
 
-Shorter and more readable tests in jest. Combines TypeScript and `Proxy`.
+Shorter and more readable tests in vitest, adapted from [jest-zest](https://www.npmjs.com/package/jest-zest). Combines TypeScript and `Proxy`.
 
 ```tsx
-import { lazy, freshFn, vary } from 'jest-zest';
+import { lazy, fresh, vary } from 'vitest-zest';
 import { render } from '@testing-library/react';
 import user from '@testing-library/user-event';
-import '@testing-library/jest-dom';
 
-// `freshFn` creates many jest.fn() that are mock.mockClear() after every test.
-const [onAddComment, onEditPost] = freshFn;
+// `fresh` creates many vi.fn() that are mock.mockClear() after every test.
+const [onAddComment, onEditPost] = fresh();
 // `vary` lets you redefine a value with nested describes, useful for given-when-then tests.
 const userKind = vary('normal');
 // `lazy` uses Proxy to lazily perform render() whose result is cached within each test run.
@@ -160,63 +159,14 @@ describe('when content is added', () => {
 
 ----
 
-### `freshFn`
-
-Can be called or destructured to create a new `jest.fn()` that is clearer with `mockClear()` after each test run.
-
-Before:
-
-```ts
-const onChange = jest.fn();
-const onFocus = jest.fn();
-const onBlur = jest.fn();
-
-afterEach(() => {
-  onChange.mockClear();
-  onFocus.mockClear();
-  onBlur.mockClear();
-});
-
-const props = {
-  onChange,
-  onFocus,
-  onBlur,
-};
-```
-
-After by calling:
-
-```ts
-import { freshFn } from 'jest-zest';
-
-const props = {
-  onChange: freshFn(),
-  onFocus: freshFn(),
-  onBlur: freshFn(),
-};
-```
-
-After by destructuring:
-
-```ts
-import { freshFn } from 'jest-zest';
-
-const [onChange, onFocus, onBlur] = freshFn;
-const props = {
-  onChange,
-  onFocus,
-  onBlur,
-};
-```
-
 ### `fresh(creator: () => T, refresher: (object: T) => void)`
 
-Create multiple of something that must be cleared for each test. Great for spies like `jest.fn()`.
+Create multiple of something that must be cleared for each test. Great for spies like `vi.fn()`.
 
 It accepts two arguments:
 
-1. Pass a function that will be called initially to create your object
-2. A function that clears the object using `afterEach()`
+1. Pass a function that will be called initially to create your object (default: `vi.fn`)
+2. A function that clears the object using `afterEach()` (default: (mock) => mock.mockClear())
 
 To then create an instance, either:
 
@@ -226,9 +176,9 @@ To then create an instance, either:
 Before:
 
 ```ts
-const onChange = jest.fn();
-const onFocus = jest.fn();
-const onBlur = jest.fn();
+const onChange = vi.fn();
+const onFocus = vi.fn();
+const onBlur = vi.fn();
 
 afterEach(() => {
   onChange.mockClear();
@@ -240,9 +190,9 @@ afterEach(() => {
 After:
 
 ```ts
-import { fresh } from 'jest-zest';
+import { fresh } from 'vitest-zest';
 
-const [onChange, onFocus, onBlur] = fresh(jest.fn, mock => mock.mockClear());
+const [onChange, onFocus, onBlur] = fresh();
 ```
 
 ----
@@ -288,7 +238,7 @@ const color = vary('');
 const subject = lazy(() => render(<Component color={color()} />));
 
 describe('when color is orange', () => {
-  color('orange');
+  new color('orange');
 
   it('shows text orange', () => {
     expect(subject.getByText('orange')).toBeInTheDocument();
@@ -296,7 +246,7 @@ describe('when color is orange', () => {
 });
 
 describe('when color is blue', () => {
-  color('blue');
+  new color('blue');
 
   it('shows text blue', () => {
     expect(subject.getByText('blue')).toBeInTheDocument();

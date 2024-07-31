@@ -1,4 +1,5 @@
-import { lazy, vary, fresh, freshFn } from './index';
+import { describe, it, beforeEach, beforeAll, afterAll, expect, vi } from 'vitest';
+import { lazy, vary, fresh } from './index';
 
 describe('lazy()', () => {
   const implementation = {
@@ -7,8 +8,8 @@ describe('lazy()', () => {
       return 5 * this.three;
     },
   };
-  const creator = jest.fn().mockReturnValue(implementation);
-  const cleanupCallback = jest.fn();
+  const creator = vi.fn().mockReturnValue(implementation);
+  const cleanupCallback = vi.fn();
   beforeEach(() => {
     creator.mockClear();
     cleanupCallback.mockClear();
@@ -186,7 +187,7 @@ describe('vary()', () => {
 });
 
 describe('fresh()', () => {
-  const objects = fresh(jest.fn, (mock) => mock.mockClear());
+  const objects = fresh();
 
   it('has infinite length', () => {
     expect(objects.length).toEqual(Infinity);
@@ -194,7 +195,7 @@ describe('fresh()', () => {
 
   const [a, b, c] = objects;
   it.each([a, b, c])('object is valid mock', (object) => {
-    expect(jest.isMockFunction(object)).toBe(true);
+    expect(vi.isMockFunction(object)).toBe(true);
   });
 
   describe('when calling a', () => {
@@ -211,36 +212,7 @@ describe('fresh()', () => {
     const result = objects();
 
     it('is valid mock', () => {
-      expect(jest.isMockFunction(result)).toBe(true);
-    });
-  });
-});
-
-describe('freshFn()', () => {
-  it('has infinite length', () => {
-    expect(freshFn.length).toEqual(Infinity);
-  });
-
-  const [a, b, c] = freshFn;
-  it.each([a, b, c])('object is mock', (object) => {
-    expect(jest.isMockFunction(object)).toBe(true);
-  });
-
-  describe('when calling a', () => {
-    beforeEach(() => {
-      a('argument');
-    });
-
-    it('has not called b', () => {
-      expect(b).toHaveBeenCalledTimes(0);
-    });
-  });
-
-  describe('when calling freshFn', () => {
-    const result = freshFn();
-
-    it('is mock', () => {
-      expect(jest.isMockFunction(result)).toBe(true);
+      expect(vi.isMockFunction(result)).toBe(true);
     });
   });
 });
