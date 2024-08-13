@@ -189,6 +189,14 @@ describe('vary()', () => {
       });
     });
   });
+
+  describe('use lazy values', () => {
+    const subject = vary(lazy(() => 5));
+
+    it('is 5', () => {
+      expect(subject()).toEqual(5);
+    });
+  });
 });
 
 describe('fresh()', () => {

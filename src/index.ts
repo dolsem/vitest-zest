@@ -3,10 +3,12 @@ import {
   type Mock,
 } from 'vitest';
 
+const lazySymbol: unique symbol = Symbol('lazy');
+
 export function lazy<T>(
   creator: () => T,
   cleanup?: (object: T) => void
-): T & (() => T) {
+): T & (() => T) & { [lazySymbol]: true } {
   let current: T | undefined;
   function doCreate() {
     if (!current) {
@@ -28,6 +30,10 @@ export function lazy<T>(
       return doCreate();
     },
     get(_obj: {}, prop) {
+      if (prop === lazySymbol) {
+        return true;
+      }
+
       if (prop === 'calls') {
         return;
       }
@@ -43,7 +49,11 @@ export function lazy<T>(
         },
       });
     },
-  }) as T & (() => T);
+  }) as any;
+}
+
+export function isLazy<T>(value: T): value is T extends (() => any & { [lazySymbol]: true }) ? T : ReturnType<typeof lazy<T>> {
+  return (value as any)?.[lazySymbol] === true;
 }
 
 export function vary<T>(initialValue: T): {
@@ -88,7 +98,11 @@ export function vary<T>(initialValue: T): {
   return new Proxy(Base, {
     apply(_target, _this, args) {
       if (args.length === 0) {
-        return currentValue;
+        if (isLazy(currentValue)) {
+          return currentValue();
+        } else {
+          return currentValue;
+        }
       } else if (args.length === 1) {
         setCurrentValue(args[0] as typeof currentValue);
         return;
