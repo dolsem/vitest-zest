@@ -36,7 +36,7 @@
     }
   },
   "scripts": {
-    "prepack": "vitest --run && npm run build",
+    "prepack": "rm -rf dist && vitest --run && npm run build",
     "dev": "parcel watch",
     "tsc": "tsc --noEmit",
     "build": "parcel build",
